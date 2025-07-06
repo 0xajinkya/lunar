@@ -24,10 +24,13 @@ import { Loaders } from './lib/loaders';
  * const app = await createServer();
  * app.listen(3000, () => console.log('Server running on port 3000'));
  */
-export const createServer = async() => {
+export const createServer = async () => {
     const app = express();
     await Loaders.LoadAll({
         app
+    });
+    app.use('/ping', (_, res) => {
+        res.send('Pong!');
     })
     app.use('/api', V1Router);
     app.all(/.*/, () => {
