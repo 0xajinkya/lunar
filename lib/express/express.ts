@@ -1,5 +1,5 @@
 import express, { type IRouterMatcher, type Router } from 'express';
-import type { Cookie } from '../utils/errors/helpers/types/common';
+import type { Cookie } from '../utils/helpers/types/common';
 
 type RouteFunction = {
     (path: string, intent: RouterHandler<any, any>): express.RequestHandler;
@@ -54,7 +54,7 @@ type IRouterSetContent =
     | { filename: string; type: 'csv' }
     | 'text';
 
-type File = Express.Multer.File & { location: string } & {
+export type File = Express.Multer.File & { location: string } & {
     etag: string;
     key: string;
 };

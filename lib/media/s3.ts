@@ -15,7 +15,7 @@ import { logger } from '../utils/logger';
 import { LunarError } from '../utils/errors';
 import { getId } from '../utils/id';
 
-export const storage = {
+export const Storage = {
     instance: new S3Client({
         region: config.storage.region.trim(),
         credentials: {

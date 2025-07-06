@@ -6,16 +6,43 @@ import { join } from "path";
 import axios from "axios";
 import { randomUUID } from "crypto";
 import { GemmaService } from "../services/gemma";
-import { GemmaPrompt } from "../lib/genai/prompt";
+import { GemmaPrompt } from "../lib/genai/prompts";
 import { GemmaSchema } from "../lib/genai/schema";
 import { GenerationService } from "../services/generation";
 import { GenerationCompanyService } from "../services/generation-company";
 import { GithubService } from "../services/github";
 import { GenerationCompanyMemberService } from "../services/generation-company-member";
 import { Database } from "../lib/database";
+import pLimit from "p-limit";
 
+const limit = pLimit(5);
 
-
+/**
+ * Task: process-generation
+ *
+ * Processes a document generation request by performing the following:
+ * - Downloads and parses a PDF from a provided file link.
+ * - Extracts text content and uses an LLM (Gemma) to detect company names.
+ * - For each detected company:
+ *   - Creates a GenerationCompany record.
+ *   - Fetches GitHub organization members.
+ *   - Bulk inserts members into GenerationCompanyMember.
+ * - Updates the Generation status accordingly.
+ * - Cleans up the temporary file after processing.
+ *
+ * This task is rate-limited to 1 concurrent execution and has a max runtime of 5 minutes.
+ *
+ * @taskId process-generation
+ * @queueConcurrency 1
+ * @maxDuration 300s
+ *
+ * @param {Object} payload - The payload passed to the task.
+ * @param {string} payload.generationId - The ID of the Generation entity to process.
+ *
+ * @returns {Promise<void>} Resolves when the task is completed or skipped.
+ *
+ * @throws {Error} Will log and mark the generation as FAILED if PDF parsing or Gemma inference fails.
+ */
 export const processGenerationTask = task({
   id: "process-generation",
   maxDuration: 300,
@@ -81,40 +108,44 @@ export const processGenerationTask = task({
         return;
       }
 
-      for (const company of gemmaResponse) {
-        const lowercaseCompany = company.trim().toLowerCase();
-        logger.log(`🏢 Processing company: ${lowercaseCompany}`);
+      await Promise.allSettled(
+        gemmaResponse.map((company) =>
+          limit(async () => {
+            const lowercaseCompany = company.trim().toLowerCase();
+            logger.log(`🏢 Processing company: ${lowercaseCompany}`);
 
-        try {
-          const generatedCompany = await GenerationCompanyService.Create({
-            name: lowercaseCompany,
-            generation: {
-              connect: { id: generation.id }
+            try {
+              const generatedCompany = await GenerationCompanyService.Create({
+                name: lowercaseCompany,
+                generation: {
+                  connect: { id: generation.id },
+                },
+              });
+
+              const githubUsers = await GithubService.GetAllOrganizationUsers(lowercaseCompany);
+
+              if (githubUsers.length === 0) {
+                logger.warn(`⚠️ No users found for ${lowercaseCompany}`);
+                return;
+              }
+
+              await GenerationCompanyMemberService.CreateBulk(
+                githubUsers.map((user) => ({
+                  avatar_url: user.avatar_url,
+                  companyId: generatedCompany.id,
+                  organizations_url: user.organizations_url,
+                  profile_url: user.html_url,
+                  repositories_url: user.repos_url,
+                  platform_id: `${user.id}`,
+                  username: user.login,
+                }))
+              );
+            } catch (err) {
+              logger.error(`❌ Failed to process company: ${lowercaseCompany}`);
             }
-          });
-
-          const githubUsers = await GithubService.GetAllOrganizationUsers(lowercaseCompany);
-          if (githubUsers.length === 0) {
-            logger.warn(`⚠️ No users found for ${lowercaseCompany}`);
-            continue;
-          };
-
-          await GenerationCompanyMemberService.CreateBulk(
-            githubUsers.map((user) => ({
-              avatar_url: user.avatar_url,
-              companyId: generatedCompany.id,
-              organizations_url: user.organizations_url,
-              profile_url: user.html_url,
-              repositories_url: user.repos_url,
-              platform_id: `${user.id}`,
-              username: user.login
-            }))
-          );
-        } catch (companyErr) {
-          logger.error(`❌ Failed to process company: ${lowercaseCompany}`);
-          continue;
-        }
-      }
+          })
+        )
+      );
 
       await GenerationService.Update(generation.id, { jobStatus: 'SUCCESS' });
       logger.log('✅ Successfully processed generation');

@@ -31,6 +31,23 @@ if (config.env === 'test') {
     );
 }
 
+/**
+ * Application-wide logger instance.
+ *
+ * This logger adapts its behavior based on the environment:
+ * - In `development`, it uses the native `console` for simplicity.
+ * - In other environments (e.g., `production`, `staging`), it uses a configured `winston` logger
+ *   with transports and metadata for structured logging.
+ *
+ * Use this logger throughout the app for logging debug info, warnings, and errors.
+ *
+ * @constant
+ * @type {Console | import("winston").Logger}
+ *
+ * @example
+ * logger.debug("Starting service...");
+ * logger.error("Something went wrong", error);
+ */
 export const logger =
     config.env === 'development'
         ? console

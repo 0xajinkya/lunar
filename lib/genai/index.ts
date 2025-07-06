@@ -1,7 +1,8 @@
 import { GoogleGenAI } from "@google/genai"
+import { config } from "../utils/env"
 
 const instance = new GoogleGenAI({
-    apiKey: 'AIzaSyC31_zLnz06bR0LvIrLvLy2SxBz_74Fbxw'
+    apiKey: config.google.genai_key
 })
 
 export const googleAI = {

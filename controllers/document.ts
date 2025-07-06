@@ -1,67 +1,64 @@
-import { tasks } from "@trigger.dev/sdk/v3";
 import type { RouterHandler } from "../lib/express/express";
-import { LunarError } from "../lib/utils/errors";
-import type { MonoResponse } from "../lib/utils/helpers/types";
-import { GenerationService } from "../services/generation";
+import type { MonoResponse } from "../lib/utils/helpers/types/common";
+import { DocumentService } from "../services/document";
 
 const Upload: RouterHandler<
     MonoResponse.Content<{
-        job_id: string
+        job_id: string;
     }>
-> = async ({
-    file
-}) => {
-        if (!file) throw new LunarError.Platform('1003');
-
-        const generation = await GenerationService.Create({
-            fileLink: file.location,
-            fileName: file.originalname,
-            jobStatus: 'PENDING'
-        });
-
-        const job = await tasks.trigger('process-generation', {
-            generationId: generation.id
-        });
-
-        await GenerationService.Update(generation.id, {
-            jobId: job.id,
-            jobStatus: 'IN_PROGRESS'
-        });
-
-        return {
-            status: true,
-            content: {
-                data: {
-                    job_id: job.id
-                }
-            }
-        };
-    }
-
-const Get: RouterHandler<MonoResponse.Content<Awaited<ReturnType<typeof GenerationService.Get>>>> = async ({
-    params: {
-        job_id
-    }
-}) => {
-    const generation = await GenerationService.Get({
-        id: job_id,
-        include: {
-            companies: {
-                include: {
-                    members: true
-                }
-            }
-        }
-    });
+> = async ({ file }) => {
+    const result = await DocumentService.Upload(file);
 
     return {
         status: true,
         content: {
-            data: generation
-        }
-    }
-}
+            data: result,
+        },
+    };
+};
+
+const Get: RouterHandler<
+    MonoResponse.Content<Awaited<ReturnType<typeof DocumentService.Get>>>
+> = async ({ params: { job_id } }) => {
+    const generation = await DocumentService.Get(job_id);
+
+    return {
+        status: true,
+        content: {
+            data: generation,
+        },
+    };
+};
+
 export const DocumentController = {
+    /**
+     * Handles the upload of a document and triggers background processing.
+     *
+     * Delegates the logic to `DocumentService.Upload`, which:
+     * - Creates a generation record
+     * - Triggers the `process-generation` task
+     * - Updates job status and returns the job ID
+     *
+     * @function Upload
+     * @type {RouterHandler<MonoResponse.Content<{ job_id: string }>>}
+     * @param {Object} context - The request context.
+     * @param {Express.MulterS3.File} context.file - The uploaded file from the request.
+     * @returns {Promise<MonoResponse.Content<{ job_id: string }>>} The job ID of the triggered generation.
+     */
     Upload,
-    Get
+
+    /**
+     * Retrieves a processed generation record by job ID.
+     *
+     * Delegates to `DocumentService.Get`, which loads:
+     * - The generation record
+     * - All related companies and their GitHub members
+     *
+     * @function Get
+     * @type {RouterHandler<MonoResponse.Content<Awaited<ReturnType<typeof DocumentService.Get>>>>}
+     * @param {Object} context - The request context.
+     * @param {string} context.params.job_id - The ID of the generation job to retrieve.
+     * @returns {Promise<MonoResponse.Content<Awaited<ReturnType<typeof DocumentService.Get>>>>} The generation record with nested companies and members.
+     */
+    Get,
 };

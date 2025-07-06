@@ -21,23 +21,11 @@ model Generation {
   fileLink    String
   jobId       String?      @unique
   jobStatus   JobStatus
-  jobResponse JobResponse?
   error       String?
 
   companies GenerationCompany[]
 
   @@map("generation")
-}
-
-model JobResponse {
-  id           String @id @default(uuid())
-  organization String
-  members      Json
-
-  generation   Generation @relation(fields: [generationId], references: [id], onDelete: Cascade)
-  generationId String     @unique
-
-  @@map("job_response")
 }
 
 model GenerationCompany {

@@ -13,4 +13,4 @@ DocumentRouter.post(
 DocumentRouter.get(
     '/status/:job_id',
     DocumentController.Get
-)
+);

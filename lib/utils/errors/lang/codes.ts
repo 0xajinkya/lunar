@@ -1,4 +1,4 @@
-import { countBy } from "../../count-by";
+import { countBy } from 'lodash';
 
 export const ErrorsList = [
   /**

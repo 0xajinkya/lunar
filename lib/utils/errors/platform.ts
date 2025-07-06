@@ -2,7 +2,7 @@ import { Context } from '@theinternetfolks/context';
 import { BaseError } from './base';
 import { ERROR_CODES, type IErrorCode, type IErrorExpanded } from './lang';
 import type { ILunarValidationMessage } from '../../validation/types';
-import type { RawDocument } from './helpers/types/common';
+import type { RawDocument } from '../helpers/types/common';
 
 export class PlatformError extends BaseError {
     details: RawDocument = {};
