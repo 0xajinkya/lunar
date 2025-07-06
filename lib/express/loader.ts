@@ -12,9 +12,11 @@ const Load = ({
             limit: '100mb',
             verify: (request: Request, res, buf, encoding) => {
                 if (buf && buf.length) {
-                    request.rawBody = buf.toString(
-                        (encoding as BufferEncoding) || 'utf8'
-                    );
+                    if (request?.rawBody) {
+                        request.rawBody = buf.toString(
+                            (encoding as BufferEncoding) || 'utf8'
+                        );
+                    }
                 }
             }
         })

@@ -3,9 +3,11 @@ import { logger } from "./lib/utils/logger";
 import { createServer } from "./server";
 
 (async () => {
+    console.log(config);
     const app = await createServer();
-    logger.debug(`🚀 Starting the platform server on port ${config.port}`);
-    app.listen(config.port);
+    app.listen(config.port, () => {
+        logger.debug(`🚀 Started the platform server on port ${config.port}`);
+    });
 })().catch((error) => logger.error(error));
 
 process.on('SIGTERM', (signal) => {
