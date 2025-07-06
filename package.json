@@ -1,0 +1,43 @@
+{
+  "name": "lunar",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev:server": "bun --watch index.ts",
+    "dev:trigger": "bunx trigger.dev@latest dev",
+    "db:migrate": "prisma migrate",
+    "db:generate": "prisma generate",
+    "db:pull": "prisma pull"
+  },
+  "devDependencies": {
+    "@trigger.dev/build": "^3.3.17",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.842.0",
+    "@google/genai": "^1.8.0",
+    "@prisma/client": "^6.11.1",
+    "@theinternetfolks/context": "^2.3.0",
+    "@theinternetfolks/snowflake": "^1.3.0",
+    "@trigger.dev/sdk": "^3.3.17",
+    "@types/express": "^5.0.3",
+    "@types/mime-types": "^3.0.1",
+    "@types/multer": "^2.0.0",
+    "@types/multer-s3": "^3.0.3",
+    "@types/sanitize-filename": "^1.6.3",
+    "axios": "^1.10.0",
+    "express": "^5.1.0",
+    "lodash": "4.17.21",
+    "mime-types": "^3.0.1",
+    "multer": "^2.0.1",
+    "multer-s3": "^3.0.1",
+    "pdfreader": "^3.0.7",
+    "prisma": "^6.11.1",
+    "sanitize-filename": "^1.6.3",
+    "winston": "^3.17.0",
+    "zod": "^3.25.67"
+  }
+}

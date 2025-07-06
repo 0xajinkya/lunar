@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum JobStatus {
+  NOT_ADDED
+  PENDING
+  IN_PROGRESS
+  FAILED
+  SUCCESS
+}
+
+model Generation {
+  id          String             @id @default(uuid())
+  fileName    String
+  fileLink    String
+  jobId       String?            @unique
+  jobStatus   JobStatus
+  jobResponse JobResponse?
+
+  companies   GenerationCompany[]
+
+  @@map("generation")
+}
+
+model JobResponse {
+  id           String     @id @default(uuid())
+  organization String
+  members      Json
+
+  generation   Generation @relation(fields: [generationId], references: [id], onDelete: Cascade)
+  generationId String     @unique
+
+  @@map("job_response")
+}
+
+model GenerationCompany {
+  id           String                   @id @default(uuid())
+  name         String
+  generation   Generation               @relation(fields: [generationId], references: [id], onDelete: Cascade)
+  generationId String
+
+  members      GenerationCompanyMember[]
+
+  @@map("generation_company")
+}
+
+model GenerationCompanyMember {
+  id               String            @id @default(uuid())
+  platform_id      String
+  avatar_url       String
+  profile_url      String
+  organizations_url String
+  repositories_url String
+
+  company          GenerationCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId        String
+
+  @@map("generation_company_member")
+}
