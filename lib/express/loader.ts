@@ -9,16 +9,7 @@ const Load = ({
     app.enable('trust proxy');
     app.use(
         json({
-            limit: '100mb',
-            verify: (request: Request, res, buf, encoding) => {
-                if (buf && buf.length) {
-                    if (request?.rawBody) {
-                        request.rawBody = buf.toString(
-                            (encoding as BufferEncoding) || 'utf8'
-                        );
-                    }
-                }
-            }
+            limit: '100mb'
         })
     );
 };

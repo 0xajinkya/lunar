@@ -3,9 +3,10 @@ import { logger } from "./lib/utils/logger";
 import { createServer } from "./server";
 
 (async () => {
+    console.log('Creating app');
     const app = await createServer();
-    console.log(app);
-    app.listen(3000, () => {
+    console.log('Created app');
+    app.listen(config.port, () => {
         logger.debug(`🚀 Started the platform server on port ${config.port}`);
     });
 })().catch((error) => logger.error(error));

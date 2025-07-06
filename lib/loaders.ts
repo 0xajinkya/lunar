@@ -9,8 +9,11 @@ type TypeLoadAllProps = {
 const LoadAll = async ({
     app
 }: TypeLoadAllProps) => {
+    console.log('Step  2.1')
     await Database.Loader();
+    console.log('Step  2.2')
     ExpressLoader.Load({ app });
+    console.log('Step  2.3')
 };
 
 export const Loaders = {
