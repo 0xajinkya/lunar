@@ -9,3 +9,8 @@ DocumentRouter.post(
     [FileUploadHandlerMiddleware('SINGLE')],
     DocumentController.Upload
 );
+
+DocumentRouter.get(
+    '/status/:job_id',
+    DocumentController.Get
+)

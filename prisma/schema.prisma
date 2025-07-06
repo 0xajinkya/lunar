@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Make sure this is set in your .env file
 }
 
 enum JobStatus {
@@ -16,20 +16,21 @@ enum JobStatus {
 }
 
 model Generation {
-  id          String             @id @default(uuid())
+  id          String       @id @default(uuid())
   fileName    String
   fileLink    String
-  jobId       String?            @unique
+  jobId       String?      @unique
   jobStatus   JobStatus
   jobResponse JobResponse?
+  error       String?
 
-  companies   GenerationCompany[]
+  companies GenerationCompany[]
 
   @@map("generation")
 }
 
 model JobResponse {
-  id           String     @id @default(uuid())
+  id           String @id @default(uuid())
   organization String
   members      Json
 
@@ -40,26 +41,27 @@ model JobResponse {
 }
 
 model GenerationCompany {
-  id           String                   @id @default(uuid())
+  id           String     @id @default(uuid())
   name         String
-  generation   Generation               @relation(fields: [generationId], references: [id], onDelete: Cascade)
+  generation   Generation @relation(fields: [generationId], references: [id], onDelete: Cascade)
   generationId String
 
-  members      GenerationCompanyMember[]
+  members GenerationCompanyMember[]
 
   @@map("generation_company")
 }
 
 model GenerationCompanyMember {
-  id               String            @id @default(uuid())
-  platform_id      String
-  avatar_url       String
-  profile_url      String
+  id                String @id @default(uuid())
+  platform_id       String
+  avatar_url        String
+  profile_url       String
   organizations_url String
-  repositories_url String
+  repositories_url  String
+  username          String
 
-  company          GenerationCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  companyId        String
+  company   GenerationCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String
 
   @@map("generation_company_member")
 }

@@ -1,5 +1,4 @@
 import { tasks } from "@trigger.dev/sdk/v3";
-import { Database } from "../lib/database";
 import type { RouterHandler } from "../lib/express/express";
 import { LunarError } from "../lib/utils/errors";
 import type { MonoResponse } from "../lib/utils/helpers/types";
@@ -12,7 +11,7 @@ const Upload: RouterHandler<
 > = async ({
     file
 }) => {
-        if (!file) throw new LunarError.Platform('404');
+        if (!file) throw new LunarError.Platform('1003');
 
         const generation = await GenerationService.Create({
             fileLink: file.location,
@@ -28,7 +27,7 @@ const Upload: RouterHandler<
             jobId: job.id,
             jobStatus: 'IN_PROGRESS'
         });
-        
+
         return {
             status: true,
             content: {
@@ -39,6 +38,30 @@ const Upload: RouterHandler<
         };
     }
 
+const Get: RouterHandler<MonoResponse.Content<Awaited<ReturnType<typeof GenerationService.Get>>>> = async ({
+    params: {
+        job_id
+    }
+}) => {
+    const generation = await GenerationService.Get({
+        id: job_id,
+        include: {
+            companies: {
+                include: {
+                    members: true
+                }
+            }
+        }
+    });
+
+    return {
+        status: true,
+        content: {
+            data: generation
+        }
+    }
+}
 export const DocumentController = {
-    Upload
+    Upload,
+    Get
 };

@@ -1,5 +1,5 @@
 import { Database } from "../lib/database";
-import type { TypeGenerationCreate, TypeGenerationUpdate } from "../types/generation";
+import type { TypeGenerationCreate, TypeGenerationInclude, TypeGenerationUpdate } from "../types/generation";
 
 const Create = async (data: TypeGenerationCreate) => {
     return await Database.instance.generation.create({
@@ -16,13 +16,28 @@ const Update = async (id: string, data: TypeGenerationUpdate) => {
     })
 };
 
-const Get = async (id: string) => {
+type TypeGetProps = {
+    id: string;
+    include?: TypeGenerationInclude
+}
+const Get = async ({
+    id,
+    include
+}: TypeGetProps) => {
     return await Database.instance.generation.findFirst({
         where: {
-            id
-        }
+            OR: [
+                {
+                    id
+                },
+                {
+                    jobId: id
+                }
+            ]
+        },
+        ...(include && { include })
     })
-}
+};
 
 export const GenerationService = {
     Create,

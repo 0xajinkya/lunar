@@ -53,7 +53,7 @@ export const FileUploadHandlerMiddleware =
                             );
                         }
                     }),
-                    limits: { fileSize: 25 * 1024 * 1024 }, // 25MB
+                    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
                     fileFilter(_req, file, cb) {
                         const extension = storage.getExtension(file.originalname);
                         const isValidExtension = AllowedExtension.includes(extension as any);

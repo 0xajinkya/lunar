@@ -7,5 +7,9 @@ export const config = {
         secret: process.env.STORAGE_SECRET!,
         bucket: process.env.STORAGE_BUCKET!,
         host: process.env.STORAGE_HOST!,
+    },
+    turso: {
+        authToken: process.env.TURSO_AUTH_TOKEN!,
+        url: process.env.TURSO_DATABASE_URL!,
     }
 }
