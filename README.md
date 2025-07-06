@@ -1,9 +1,5 @@
 # Lunar
-
-A modern, AI-powered document processing platform built with Node.js, Express, Prisma, and Bun. It extracts company information from uploaded PDFs, enriches it with GitHub data, and provides a robust API for document upload and status tracking.
-
 ---
-
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
