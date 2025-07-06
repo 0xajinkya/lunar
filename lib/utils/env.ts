@@ -18,7 +18,7 @@
 
 export const config = {
     env: process.env.ENV,
-    port: process.env.PORT || 3000,
+    port: Number(process.env.PORT || 3000),
     storage: {
         key: process.env.STORAGE_KEY!,
         region: process.env.STORAGE_REGION!,
