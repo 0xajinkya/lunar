@@ -25,22 +25,16 @@ import { Loaders } from './lib/loaders';
  * app.listen(3000, () => console.log('Server running on port 3000'));
  */
 export const createServer = async() => {
-    console.log("Step 1");
     const app = express();
-    console.log("Step 2");
     await Loaders.LoadAll({
         app
     })
-    console.log("Step 3");
     app.use('/api', V1Router);
-    console.log("Step 4");
     app.all(/.*/, () => {
         throw new LunarError.NotFound();
     });
-    console.log("Step 5");
     app.use(LunarError.Middleware((error, req, res) => {
-        logger.error('Captured Error:', error.message);
+        logger.error('Captured Error:', error);
     }));
-    console.log("Step 6");
     return app;
 }

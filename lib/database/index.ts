@@ -4,14 +4,10 @@ import { logger } from "../utils/logger";
 const Loader = async () => {
     try {
         const client = new PrismaClient();
-        // await client.$connect();
         logger.debug("✅ Database connected");
         Database.instance = client;
     } catch (error) {
         logger.error("❌ Database connection error:", error);
-        console.log(error);
-    } finally {
-        return;
     }
 };
 
