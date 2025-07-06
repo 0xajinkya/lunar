@@ -4,6 +4,7 @@ import { createServer } from "./server";
 
 (async () => {
     const app = await createServer();
+    console.log(app);
     app.listen(3000, () => {
         logger.debug(`🚀 Started the platform server on port ${config.port}`);
     });
