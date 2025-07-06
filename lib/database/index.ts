@@ -5,9 +5,12 @@ const Loader = async () => {
     try {
         await prismaInstance.$connect();
         logger.debug("✅ Database connected");
+        console.log("✅ Database connected");
     } catch (error) {
         logger.error("❌ Database connection error:", error);
         console.log(error);
+    } finally {
+        return;
     }
 };
 
