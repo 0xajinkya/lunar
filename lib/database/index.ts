@@ -1,11 +1,12 @@
+import { PrismaClient } from "@prisma/client";
 import { logger } from "../utils/logger";
-import { prismaInstance } from "./instance";
 
 const Loader = async () => {
     try {
-        await prismaInstance.$connect();
+        const client = new PrismaClient();
+        // await client.$connect();
         logger.debug("✅ Database connected");
-        console.log("✅ Database connected");
+        Database.instance = client;
     } catch (error) {
         logger.error("❌ Database connection error:", error);
         console.log(error);
@@ -29,7 +30,7 @@ export const Database = {
      * @example
      * const users = await prismaInstance.user.findMany();
      */
-    instance: prismaInstance,
+    instance: null as unknown as PrismaClient,
     /**
      * Initializes and connects the Prisma database client.
      *
