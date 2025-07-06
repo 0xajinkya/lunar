@@ -7,7 +7,7 @@ const Loader = async () => {
         logger.debug("✅ Database connected");
     } catch (error) {
         logger.error("❌ Database connection error:", error);
-        process.exit(1); // Hard exit on failure
+        console.log(error);
     }
 };
 
